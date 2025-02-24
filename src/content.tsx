@@ -212,7 +212,7 @@ const Popover: React.FC<TextTransformerProps> = ({
   return (
     <div
       ref={popperRef}
-      className="z-[999999] bg-[#0000ff85] bg-opacity-95 shadow-lg backdrop-blur px-4 py-4 border border-[#3d3d42] rounded-xl w-[400px] font-inter text-white text-sm transition-opacity duration-300 popover"
+      className="z-[999999] bg-black bg-opacity-90 shadow-lg backdrop-blur px-4 py-4 border border-[#3d3d42] rounded-xl w-[400px] font-inter text-white text-sm transition-opacity duration-300 popover"
       style={styles.popper}
       {...attributes.popper}
     >
@@ -229,8 +229,9 @@ const Popover: React.FC<TextTransformerProps> = ({
         <>
         <div className="mt-4">
         <button
-            className="bg-blue-800 !important w-full hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
+            className="w-full hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
             onClick={handleGenarteWithText}
+            style={{background:"#193cb8"}}
           >
             <WandSparkles />
             Extract (Data + Chart) 
@@ -241,15 +242,17 @@ const Popover: React.FC<TextTransformerProps> = ({
         <>
         <div className="flex flex-col gap-4 mt-4">
           <button
-            className="bg-blue-800 !important hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
+            className="!important hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
             onClick={handleDownLoad}
+            style={{background:"#193cb8"}}
           >
             <FileOutput />
             Extract Data (CSV)
           </button>
           <button
-            className="bg-blue-800 hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
+            className=" hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
             onClick={handleShare}
+            style={{background:"#193cb8"}}
           >
             <ChartColumn />
             Create Chart
