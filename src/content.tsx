@@ -3,7 +3,7 @@ import browser from "webextension-polyfill";
 import { usePopper } from "react-popper";
 import { createRoot } from "react-dom/client";
 import { getStyles } from "./utils/styles";
-import { Shell, Copy, Check, FileOutput, ChartColumn } from "lucide-react";
+import { Shell, Copy, Check, FileOutput, ChartColumn, WandSparkles } from "lucide-react";
 import { getStorageValue, setStorageValue } from "./hooks/useLocalStorage";
 import { SETTINGS } from "./constants";
 import "./content.css";
@@ -29,7 +29,11 @@ const Popover: React.FC<TextTransformerProps> = ({
 }) => {
   const [sliderValue, setSliderValue] = useState(sliderLabels.length - 1);
   const [transformedText, setTransformedText] = useState("");
+  const [previewLink, setPreviewLink] = useState("");
+  const [shareLink, setShareLink] = useState("");
+  const [csvLink, setCsvLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccses, setIsSuccses] = useState(false);
   const [isRTL, setIsRTL] = useState(false);
   const [showCheck, setShowCheck] = useState(false);
   const popperRef = useRef<HTMLDivElement>(null);
@@ -103,6 +107,98 @@ const Popover: React.FC<TextTransformerProps> = ({
     setIsRTL(isTextRTL(response));
     setIsLoading(false);
   };
+  const handleGenarteWithText = async () => {
+    setIsLoading(true);
+  
+    try {
+      const token = await getStorageValue(SETTINGS.USERTOKEN, "");
+      const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
+      if (!token ) {
+        alert("Please log in in extenion");
+        setIsLoading(false);
+        return;
+      }
+  
+      const apiEndpoint = "https://plotset.com/api/snap/text";
+      const textBlob = new Blob([selectedText], { type: "text/plain" });
+      const bodyFormData = new FormData();
+      bodyFormData.append("file", textBlob, "content.txt");
+  
+      const response = await fetch(apiEndpoint, {
+        method: "POST",
+        body: bodyFormData,
+        headers: {
+          Authorization: `${token}`,
+        },
+      });
+  
+      if (!response.ok) throw new Error("Failed to upload text");
+  
+      const data = await response.json();
+      const id = data.projectId;
+      const editUrl = `https://plotset.com/ai/edit-data/${id}`;
+      setPreviewLink(editUrl);
+
+      const projectApi = `https://plotset.com/api/project/get/${id}`;
+      const projectResponse = await fetch(projectApi, {
+      method: "GET",
+      headers: {
+        Authorization: `${token}`,
+      },
+      });
+      if (!projectResponse.ok) throw new Error("Failed to fetch project details");
+
+      const projectData = await projectResponse.json();
+      const datasetUrl = projectData?.data?.dataset?.url;
+      if (!datasetUrl) throw new Error("Dataset URL not found");
+
+      // Step 3: Construct full URL and download the file
+      const fullDownloadUrl = `https://plotset.com/api/${datasetUrl}`;
+      setCsvLink(fullDownloadUrl);
+
+      // Step 4: Create Embed & Get Share Link
+    const embedApi = "https://plotset.com/api/embed/create";
+    const embedResponse = await fetch(embedApi, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${token}`,
+      },
+      body: JSON.stringify({ id: id }),
+    });
+
+    if (!embedResponse.ok) throw new Error("Failed to create embed");
+
+    const embedData = await embedResponse.json();
+    const shareUrl = `https://plotset.com/share/${embedData.shareId}`;
+    setShareLink(shareUrl); 
+    console.log("Share URL:", shareUrl);
+    setIsSuccses(true)
+  
+    } catch (error) {
+      setIsSuccses(false)
+      console.error("Error extracting data:", error);
+      alert("Failed to extract data.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  const handleDownLoad = () => {
+    const link = document.createElement("a");
+      link.href = csvLink;
+      link.setAttribute("download", "dataset.csv"); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+  const handleShare = () => {
+    if (shareLink) {
+      window.open(shareLink, '_blank');
+    } else {
+      alert("Share link is not available.");
+    }
+  };
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(transformedText);
@@ -129,24 +225,53 @@ const Popover: React.FC<TextTransformerProps> = ({
       <div className="flex flex-col gap-4 px-6">
         <div className="font-semibold text-white">Plotset</div>
 
-        {/* Slider Container */}
-        {/*  */}
+       {!isSuccses  ? (
+        <>
+        <div className="mt-4">
+        <button
+            className="bg-blue-800 !important w-full hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
+            onClick={handleGenarteWithText}
+          >
+            <WandSparkles />
+            Extract (Data + Chart) 
+          </button>
+        </div>
+        </>
+       ) : (
+        <>
         <div className="flex flex-col gap-4 mt-4">
           <button
             className="bg-blue-800 !important hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
-            // onClick={handleExtractCSV}
+            onClick={handleDownLoad}
           >
             <FileOutput />
             Extract Data (CSV)
           </button>
           <button
             className="bg-blue-800 hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
-            // onClick={handleCreateChart}
+            onClick={handleShare}
           >
             <ChartColumn />
             Create Chart
           </button>
         </div>
+        {previewLink && (
+    <div className="mt-2">
+      <p>You can see more details:</p>
+      <a
+        href={previewLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-white underline"
+      >
+        {previewLink}
+      </a>
+    </div>
+  )}
+        </>
+       )}
+        
+        
 
         <div className="flex flex-col justify-center items-center mt-4 max-h-[400px] overflow-y-auto text-white">
           {isLoading ? (
