@@ -51,8 +51,9 @@ const Popup = () => {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async() => {
     setToken(""); 
+    await setStorageValue(SETTINGS.ISLOGGEDIN, false); 
     setIsLoggedIn(false);
   };
  
