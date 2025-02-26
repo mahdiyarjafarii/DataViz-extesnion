@@ -36,6 +36,7 @@ const Popover: React.FC<TextTransformerProps> = ({
   const [previewLink, setPreviewLink] = useState("");
   const [shareLink, setShareLink] = useState("");
   const [csvLink, setCsvLink] = useState("");
+  const [imageLink, setImageLink] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccses, setIsSuccses] = useState(false);
   const [isRTL, setIsRTL] = useState(false);
@@ -154,11 +155,15 @@ const Popover: React.FC<TextTransformerProps> = ({
 
       const projectData = await projectResponse.json();
       const datasetUrl = projectData?.data?.dataset?.url;
+      const imageUrl = projectData?.data?.thumbnail;
       if (!datasetUrl) throw new Error("Dataset URL not found");
 
       // Step 3: Construct full URL and download the file
       const fullDownloadUrl = `https://plotset.com/api/${datasetUrl}`;
       setCsvLink(fullDownloadUrl);
+
+      const fullImageUrl = `https://plotset.com/api/${imageUrl}`;
+      setImageLink(fullImageUrl);
 
       // Step 4: Create Embed & Get Share Link
       const embedApi = "https://plotset.com/api/embed/create";
@@ -202,8 +207,13 @@ const Popover: React.FC<TextTransformerProps> = ({
     }
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(transformedText);
+  const handleCopy = (isSuccses:any) => {
+    if(isSuccses){
+      navigator.clipboard.writeText(previewLink);
+    }else{
+      navigator.clipboard.writeText(transformedText);
+    }
+    
     setShowCheck(true);
     // Show check for 1 second then revert to copy icon
     setTimeout(() => {
@@ -279,75 +289,128 @@ const Popover: React.FC<TextTransformerProps> = ({
                   gap: "8px",
                   justifyContent: "center",
                   alignItems: "center",
-                  cursor: "pointer",
+                  cursor: isLoading ? "not-allowed" : "pointer",
                   transition: "background-color 0.2s",
                 }}
                 onClick={handleGenarteWithText}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "#172a8e")
+                  !isLoading && (e.currentTarget.style.background = "#172a8e")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "#193cb8")
+                  !isLoading && (e.currentTarget.style.background = "#193cb8")
                 }
+                disabled={isLoading}
               >
-                <WandSparkles />
-                Extract (Data + Chart)
+                {isLoading ? (
+                  <>We are analyzing ...</>
+                ) : (
+                  <>
+                    <WandSparkles />
+                    Extract (Data + Chart)
+                  </>
+                )}
               </button>
             </div>
           </>
         ) : (
           <>
-            <div className="flex flex-col gap-4 mt-4">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                gap: "1rem",
+                marginTop: "1rem",
+              }}
+            >
               <button
-                className="!important hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
                 onClick={handleDownLoad}
-                style={{ background: "#193cb8" }}
+                style={{
+                  background: "#193cb8",
+                  padding: "0.5rem",
+                  borderRadius: "9999px",
+                  color: "white",
+                  display: "flex",
+                  gap: "0.5rem",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
+                  width: "100%",
+                  fontSize: "12px",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#1e3a8a")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "#193cb8")
+                }
               >
                 <FileOutput />
                 Extract Data (CSV)
               </button>
               <button
-                className=" hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
                 onClick={handleShare}
-                style={{ background: "#193cb8" }}
+                style={{
+                  background: "#193cb8",
+                  padding: "0.5rem",
+                  borderRadius: "9999px",
+                  color: "white",
+                  display: "flex",
+                  gap: "0.5rem",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  cursor: "pointer",
+                  transition: "background-color 0.3s",
+                  width: "100%",
+                  fontSize: "12px",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#1e3a8a")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "#193cb8")
+                }
               >
                 <ChartColumn />
                 Create Chart
               </button>
             </div>
-            {previewLink && (
-              <div className="mt-2">
-                <p>You can see more details:</p>
-                <a
-                  href={previewLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-white underline"
-                >
-                  {previewLink}
-                </a>
-              </div>
-            )}
           </>
         )}
 
         <div className="flex flex-col justify-center items-center mt-4 max-h-[400px] overflow-y-auto text-white">
           {isLoading ? (
-            <Shell className="animate-spin" />
+            <div style={{ height: "32px" }}>
+              <Shell className="animate-spin" />
+            </div>
+          ) : isSuccses && imageLink ? (
+            <img src={imageLink} alt="Success" />
           ) : (
             <span
-              className={`font-semibold ${
-                isRTL ? "text-right direction-rtl" : "text-left"
-              }`}
+              className={`font-semibold ${isRTL ? "text-right direction-rtl" : "text-left"}`}
               dir={isRTL ? "rtl" : "ltr"}
             >
               {transformedText}
             </span>
           )}
+          {isSuccses && previewLink && (
+            <div className="mt-2">
+              <p>You can see more details:</p>
+              <a
+                href={previewLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white underline"
+              >
+                {previewLink}
+              </a>
+            </div>
+          )}
           {!isLoading && transformedText && (
             <button
-              className="bg-teal-500 hover:bg-teal-600 mt-2 p-1 rounded-full text-white transition-colors"
-              onClick={handleCopy}
+              style={{marginTop:"12px"}}
+              className="bg-teal-500 hover:bg-teal-600  p-1 rounded-full text-white transition-colors mt-2.5"
+              onClick={()=>{handleCopy(isSuccses)}}
               title={showCheck ? "Copied!" : "Copy to clipboard"}
             >
               {showCheck ? <Check size={16} /> : <Copy size={16} />}
@@ -437,6 +500,7 @@ const TextTransformerApp: React.FC = () => {
     if (selection?.referenceElement) {
       selection.referenceElement.remove();
     }
+  
     setSelection(null);
     setIsVisible(true);
     removeHighlight();
