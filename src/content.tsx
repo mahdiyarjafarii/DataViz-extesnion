@@ -108,17 +108,16 @@ const Popover: React.FC<TextTransformerProps> = ({
     setIsLoading(false);
   };
   const handleGenarteWithText = async () => {
-    setIsLoading(true);
-  
+    const token = await getStorageValue(SETTINGS.USERTOKEN, "");
+    const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
+    if (!token || !status ) {
+      alert("Please log in in extenion");
+      setIsLoading(false);
+      return;
+    };
+    
     try {
-      const token = await getStorageValue(SETTINGS.USERTOKEN, "");
-      const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
-      if (!token ) {
-        alert("Please log in in extenion");
-        setIsLoading(false);
-        return;
-      }
-  
+      setIsLoading(true);
       const apiEndpoint = "https://plotset.com/api/snap/text";
       const textBlob = new Blob([selectedText], { type: "text/plain" });
       const bodyFormData = new FormData();
@@ -211,30 +210,72 @@ const Popover: React.FC<TextTransformerProps> = ({
 
   return (
     <div
-      ref={popperRef}
-      className="z-[999999] bg-black bg-opacity-90 shadow-lg backdrop-blur px-4 py-4 border border-[#3d3d42] rounded-xl w-[400px] font-inter text-white text-sm transition-opacity duration-300 popover"
-      style={styles.popper}
-      {...attributes.popper}
-    >
-      <button
-        className="top-2 right-2 absolute bg-transparent hover:bg-white/10 p-1 border-none rounded-full w-6 h-6 text-white/60 hover:text-white text-xl transition-all ease-in-out cursor-pointer"
-        onClick={onClose}
-      >
-        ×
-      </button>
-      <div className="flex flex-col gap-4 px-6">
-        <div className="font-semibold text-white">Plotset</div>
+  ref={popperRef}
+  style={{
+    ...styles.popper,
+    zIndex: 999999,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+    backdropFilter: "blur(10px)",
+    padding: "16px", 
+    border: "1px solid #3d3d42",
+    borderRadius: "12px", 
+    width: "400px",
+    fontFamily: "Inter, sans-serif",
+    color: "white",
+    fontSize: "14px", 
+    transition: "opacity 300ms",
+  }}
+  {...attributes.popper}
+>
+<button
+    style={{
+      position: "absolute",
+      top: "8px",
+      right: "8px",
+      background: "transparent",
+      padding: "4px",
+      border: "none",
+      borderRadius: "50%",
+      width: "24px",
+      height: "24px",
+      color: "rgba(255, 255, 255, 0.6)",
+      fontSize: "20px",
+      transition: "all 0.2s ease-in-out",
+      cursor: "pointer",
+    }}
+    onClick={onClose}
+    onMouseEnter={(e) => (e.currentTarget.style.color = "white")}
+    onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255, 255, 255, 0.6)")}
+  >
+    ×
+  </button>
+     <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "0 24px" }}>
+        <div style={{ fontWeight: "600", color: "white" }}>Plotset</div>
 
        {!isSuccses  ? (
         <>
-        <div className="mt-4">
+        <div style={{ marginTop: "16px" }}>
         <button
-            className="w-full hover:bg-blue-950 p-2 rounded-full text-white transition-colors flex gap-2 justify-center items-center cursor-pointer"
+            style={{
+              width: "100%",
+              background: "#193cb8",
+              padding: "8px",
+              borderRadius: "9999px",
+              color: "white",
+              display: "flex",
+              gap: "8px",
+              justifyContent: "center",
+              alignItems: "center",
+              cursor: "pointer",
+              transition: "background-color 0.2s",
+            }}
             onClick={handleGenarteWithText}
-            style={{background:"#193cb8"}}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#172a8e")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "#193cb8")}
           >
             <WandSparkles />
-            Extract (Data + Chart) 
+            Extract (Data + Chart)
           </button>
         </div>
         </>
