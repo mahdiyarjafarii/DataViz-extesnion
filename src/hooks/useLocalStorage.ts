@@ -3,7 +3,7 @@ import browser from "webextension-polyfill";
 
 export async function getStorageValue<T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): Promise<T> {
   try {
     const result = await browser.storage.local.get(key);
@@ -12,7 +12,7 @@ export async function getStorageValue<T>(
   } catch (error) {
     console.error(
       `Error getting data from browser.storage.local for key "${key}":`,
-      error
+      error,
     );
     return defaultValue;
   }
@@ -24,7 +24,7 @@ export async function setStorageValue<T>(key: string, value: T) {
   } catch (error) {
     console.error(
       `Error setting data to browser.storage.local for key "${key}":`,
-      error
+      error,
     );
   }
 }
@@ -32,7 +32,7 @@ export async function setStorageValue<T>(key: string, value: T) {
 // Custom hook for localStorage
 function useLocalStorage<T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, (newValue: T) => void] {
   const [value, setValue] = useState<T>(() => {
     let initialValue: T = defaultValue;
@@ -50,19 +50,19 @@ function useLocalStorage<T>(
 
     const handleStorageChange = (
       changes: { [key: string]: any },
-      areaName: string
+      areaName: string,
     ) => {
       if (areaName === "local" && changes[key]) {
         try {
           setValue(
             changes[key].newValue
               ? JSON.parse(changes[key].newValue as string)
-              : defaultValue
+              : defaultValue,
           );
         } catch (error) {
           console.error(
             `Error parsing data from browser.storage.local for key "${key}":`,
-            error
+            error,
           );
         }
       }
@@ -85,11 +85,11 @@ function useLocalStorage<T>(
       } catch (error) {
         console.error(
           `Error setting data to browser.storage.local for key "${key}":`,
-          error
+          error,
         );
       }
     },
-    [key, setValue]
+    [key, setValue],
   );
 
   return [value, updateValue];

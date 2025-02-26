@@ -15,7 +15,7 @@ const validateUser = async () => {
     const response = await fetch(AUTH_CHECK_URL, {
       method: "GET",
       headers: {
-        "Authorization": `${token}`,
+        Authorization: `${token}`,
       },
     });
 
@@ -25,12 +25,12 @@ const validateUser = async () => {
       await setStorageValue(SETTINGS.ISLOGGEDIN, true);
       return true;
     } else {
-      await setStorageValue(SETTINGS.ISLOGGEDIN, false); 
+      await setStorageValue(SETTINGS.ISLOGGEDIN, false);
       return false;
     }
   } catch (error) {
     console.error("Error validating user:", error);
-    await setStorageValue(SETTINGS.ISLOGGEDIN, false); 
+    await setStorageValue(SETTINGS.ISLOGGEDIN, false);
     return false;
   }
 };

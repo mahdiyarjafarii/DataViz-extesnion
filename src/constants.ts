@@ -1,6 +1,6 @@
 export const SETTINGS = {
   USERTOKEN: "user_token",
-  ISLOGGEDIN:"isLogin",
+  ISLOGGEDIN: "isLogin",
   ENDPOINT: "endpoint",
   STYLE: "style",
   ENABLED: "isEnabled",

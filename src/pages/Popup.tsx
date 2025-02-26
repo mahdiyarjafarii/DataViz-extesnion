@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from "react";
 import { ChartNetwork, ChevronDown, ChevronUp } from "lucide-react";
-import useLocalStorage, { getStorageValue, setStorageValue } from "../hooks/useLocalStorage";
+import useLocalStorage, {
+  getStorageValue,
+  setStorageValue,
+} from "../hooks/useLocalStorage";
 import { SETTINGS } from "../constants";
 
 const Popup = () => {
   const [email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
-  const [token , setToken] = useLocalStorage(SETTINGS.USERTOKEN, "");
+  const [token, setToken] = useLocalStorage(SETTINGS.USERTOKEN, "");
   const [isEnabled, setIsEnabled] = useLocalStorage(SETTINGS.ENABLED, true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [loginError, setLoginError] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const handleLogin = async () => {
     setLoading(true);
@@ -36,7 +39,7 @@ const Popup = () => {
       if (data.results) {
         setToken(data.user.token);
         setSuccess(true);
-        setIsLoggedIn(true)
+        setIsLoggedIn(true);
         await setStorageValue(SETTINGS.ISLOGGEDIN, true);
       } else {
         setLoginError("Login failed: " + data.message);
@@ -51,50 +54,46 @@ const Popup = () => {
     }
   };
 
-  const handleLogout = async() => {
-    setToken(""); 
-    await setStorageValue(SETTINGS.ISLOGGEDIN, false); 
+  const handleLogout = async () => {
+    setToken("");
+    await setStorageValue(SETTINGS.ISLOGGEDIN, false);
     setIsLoggedIn(false);
   };
- 
 
-    const checkLoginStatus = async () => {
-      try {
-        const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
-        setIsLoggedIn(status); 
-      } catch (error) {
-        console.error("Error checking login status:", error);
-        setIsLoggedIn(false); 
-      }
-    };
-  
-    useEffect(() => {
-      checkLoginStatus();
-    }, []);
+  const checkLoginStatus = async () => {
+    try {
+      const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
+      setIsLoggedIn(status);
+    } catch (error) {
+      console.error("Error checking login status:", error);
+      setIsLoggedIn(false);
+    }
+  };
 
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 bg-[#0771ed] p-6 min-w-[320px] text-white">
       <div className="space-y-2">
         <h1 className="font-semibold text-2xl tracking-tight">Plotset</h1>
-        <p className="text-gray-200  text-sm">
-        AI-Powered Data Visualization
-        </p>
+        <p className="text-gray-200  text-sm">AI-Powered Data Visualization</p>
         <div className="flex justify-between items-center">
-            <label className="text-gray-200 text-sm">Enable Extension</label>
+          <label className="text-gray-200 text-sm">Enable Extension</label>
+          <div
+            className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer ${
+              isEnabled ? "bg-teal-600" : "bg-gray-700"
+            }`}
+            onClick={() => setIsEnabled(!isEnabled)}
+          >
             <div
-              className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer ${
-                isEnabled ? "bg-teal-600" : "bg-gray-700"
+              className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
+                isEnabled ? "translate-x-6" : ""
               }`}
-              onClick={() => setIsEnabled(!isEnabled)}
-            >
-              <div
-                className={`bg-white w-4 h-4 rounded-full shadow-md transform duration-300 ease-in-out ${
-                  isEnabled ? "translate-x-6" : ""
-                }`}
-              />
-            </div>
+            />
           </div>
+        </div>
       </div>
       {isLoggedIn ? (
         <>
@@ -111,7 +110,9 @@ const Popup = () => {
           <div className="flex gap-4 border-white border-b">
             <button
               className={`pb-2 text-sm ${
-                activeTab === "login" ? "text-teal-400 border-b-2 border-teal-400" : "text-gray-100"
+                activeTab === "login"
+                  ? "text-teal-400 border-b-2 border-teal-400"
+                  : "text-gray-100"
               }`}
               onClick={() => setActiveTab("login")}
             >
@@ -119,7 +120,9 @@ const Popup = () => {
             </button>
             <button
               className={`pb-2 text-sm ${
-                activeTab === "info" ? "text-teal-400 border-b-2 border-teal-400" : "text-gray-100"
+                activeTab === "info"
+                  ? "text-teal-400 border-b-2 border-teal-400"
+                  : "text-gray-100"
               }`}
               onClick={() => setActiveTab("info")}
             >
@@ -150,27 +153,44 @@ const Popup = () => {
               >
                 {loading ? "Loading ..." : "Login"}
               </button>
-              {success && <div className="text-teal-400 text-sm text-center">Success!</div>}
-              {loginError && <div className="text-red-400 text-sm text-center">{loginError}</div>}
+              {success && (
+                <div className="text-teal-400 text-sm text-center">
+                  Success!
+                </div>
+              )}
+              {loginError && (
+                <div className="text-red-400 text-sm text-center">
+                  {loginError}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-4 text-gray-300 text-sm">
-              <h3 className="font-medium text-gray-200">How to Configure Settings</h3>
+              <h3 className="font-medium text-gray-200">
+                How to Configure Settings
+              </h3>
               <div className="space-y-2">
                 <p>
-                  <strong>Endpoint:</strong> Enter the base URL for your OpenAI or compatible API (e.g., https://api.openai.com/v1 or your custom endpoint).
+                  <strong>Endpoint:</strong> Enter the base URL for your OpenAI
+                  or compatible API (e.g., https://api.openai.com/v1 or your
+                  custom endpoint).
                 </p>
                 <p>
-                  <strong>API Key:</strong> Obtain your API key from the OpenAI platform or your API provider and paste it here.
+                  <strong>API Key:</strong> Obtain your API key from the OpenAI
+                  platform or your API provider and paste it here.
                 </p>
                 <p>
-                  <strong>Model:</strong> Select a model from the dropdown. Available models will load once a valid endpoint and API key are provided.
+                  <strong>Model:</strong> Select a model from the dropdown.
+                  Available models will load once a valid endpoint and API key
+                  are provided.
                 </p>
                 <p>
-                  <strong>Style:</strong> Optional custom text style instructions for the AI output.
+                  <strong>Style:</strong> Optional custom text style
+                  instructions for the AI output.
                 </p>
                 <p>
-                  <strong>Minimum Words:</strong> Set the minimum number of words required to trigger the popup (default is 5).
+                  <strong>Minimum Words:</strong> Set the minimum number of
+                  words required to trigger the popup (default is 5).
                 </p>
               </div>
             </div>
