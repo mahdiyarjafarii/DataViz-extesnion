@@ -207,13 +207,13 @@ const Popover: React.FC<TextTransformerProps> = ({
     }
   };
 
-  const handleCopy = (isSuccses:any) => {
-    if(isSuccses){
+  const handleCopy = (isSuccses: any) => {
+    if (isSuccses) {
       navigator.clipboard.writeText(previewLink);
-    }else{
+    } else {
       navigator.clipboard.writeText(transformedText);
     }
-    
+
     setShowCheck(true);
     // Show check for 1 second then revert to copy icon
     setTimeout(() => {
@@ -408,9 +408,11 @@ const Popover: React.FC<TextTransformerProps> = ({
           )}
           {!isLoading && transformedText && (
             <button
-              style={{marginTop:"12px"}}
+              style={{ marginTop: "12px" }}
               className="bg-teal-500 hover:bg-teal-600  p-1 rounded-full text-white transition-colors mt-2.5"
-              onClick={()=>{handleCopy(isSuccses)}}
+              onClick={() => {
+                handleCopy(isSuccses);
+              }}
               title={showCheck ? "Copied!" : "Copy to clipboard"}
             >
               {showCheck ? <Check size={16} /> : <Copy size={16} />}
@@ -500,7 +502,7 @@ const TextTransformerApp: React.FC = () => {
     if (selection?.referenceElement) {
       selection.referenceElement.remove();
     }
-  
+
     setSelection(null);
     setIsVisible(true);
     removeHighlight();

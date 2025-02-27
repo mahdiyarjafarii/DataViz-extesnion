@@ -238,7 +238,7 @@ const addImageButtons = () => {
     if (img.dataset.hasButton) return;
 
     // **Filtering Conditions**
-    const isSmall = img.width < 50 || img.height < 50;
+    const isSmall = img.width < 350 || img.height < 300;
     const isLogoOrIcon =
       img.classList.contains("logo") ||
       img.classList.contains("icon") ||
