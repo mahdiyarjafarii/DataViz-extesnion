@@ -34,15 +34,15 @@ const AIButton: React.FC<{ imgElement: HTMLImageElement }> = ({
   });
 
   const handleGenarteWithImage = async () => {
-    setIsLoading(true);
     try {
       const token = await getStorageValue(SETTINGS.USERTOKEN, "");
       const status = await getStorageValue(SETTINGS.ISLOGGEDIN, false);
-      if (!token) {
+      if (!token || !status) {
         alert("Please log in in extenion");
         setIsLoading(false);
         return;
       }
+      setIsLoading(true);
 
       const imageResponse = await fetch(imgElement.src);
       if (!imageResponse.ok) throw new Error("Failed to fetch image");
@@ -251,6 +251,14 @@ const isElementVisible = (element: HTMLImageElement) => {
   );
 };
 
+const isProgressiveImage = (img: HTMLImageElement) => {
+  // Check if the image is a placeholder (data URL or SVG) before loading the real image.
+  return (
+    img.src.startsWith("data:image/svg+xml") ||
+    img.src.startsWith("data:image/png")
+  );
+};
+
 const isValidImage = (img: HTMLImageElement) => {
   return (
     img.src &&
@@ -286,6 +294,7 @@ const isMostlyTransparent = async (img: HTMLImageElement) => {
 
 const addImageButtons = async () => {
   document.querySelectorAll("img").forEach(async (img) => {
+    if (isProgressiveImage(img)) return;
     if (img.dataset.hasButton) return;
 
     if (
