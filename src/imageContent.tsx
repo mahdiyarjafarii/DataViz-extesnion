@@ -233,42 +233,83 @@ const AIButton: React.FC<{ imgElement: HTMLImageElement }> = ({
   );
 };
 
-const addImageButtons = () => {
-  document.querySelectorAll("img").forEach((img) => {
+const seenImages = new Set<string>();
+
+const isElementVisible = (element: HTMLImageElement) => {
+  const rect = element.getBoundingClientRect();
+  const computedStyle = window.getComputedStyle(element);
+  return (
+    rect.width > 0 &&
+    rect.height > 0 &&
+    rect.bottom > 0 &&
+    rect.right > 0 &&
+    rect.top < window.innerHeight &&
+    rect.left < window.innerWidth &&
+    computedStyle.display !== "none" &&
+    computedStyle.visibility !== "hidden" &&
+    parseFloat(computedStyle.opacity) > 0
+  );
+};
+
+const isValidImage = (img: HTMLImageElement) => {
+  return (
+    img.src &&
+    img.naturalWidth > 0 &&
+    img.naturalHeight > 0 &&
+    !img.src.includes("placeholder") &&
+    !img.src.includes("spinner") &&
+    !img.src.includes("loading")
+  );
+};
+
+const isMostlyTransparent = async (img: HTMLImageElement) => {
+  return new Promise<boolean>((resolve) => {
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return resolve(false);
+
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+
+    const imageData = ctx.getImageData(0, 0, img.width, img.height).data;
+    let transparentPixels = 0;
+    let totalPixels = img.width * img.height;
+
+    for (let i = 3; i < imageData.length; i += 4) {
+      if (imageData[i] < 50) transparentPixels++;
+    }
+
+    resolve(transparentPixels / totalPixels > 0.6);
+  });
+};
+
+const addImageButtons = async () => {
+  document.querySelectorAll("img").forEach(async (img) => {
     if (img.dataset.hasButton) return;
 
-    // **Filtering Conditions**
-    const isSmall = img.width < 350 || img.height < 300;
-    const isLogoOrIcon =
-      img.classList.contains("logo") ||
-      img.classList.contains("icon") ||
-      img.id.includes("logo") ||
-      img.id.includes("icon");
+    if (
+      !isElementVisible(img) ||
+      !isValidImage(img) ||
+      seenImages.has(img.src)
+    ) {
+      return;
+    }
 
-    const srcLower = img.src.toLowerCase();
-    const isKnownIcon =
-      srcLower.includes("logo") ||
-      srcLower.includes("favicon") ||
-      srcLower.includes("icon") ||
-      srcLower.endsWith(".ico") ||
-      srcLower.endsWith(".svg");
+    if (await isMostlyTransparent(img)) return;
+    seenImages.add(img.src);
 
-    if (isSmall || isLogoOrIcon || isKnownIcon) return;
-
-    // Create a wrapper div
     const wrapper = document.createElement("div");
     wrapper.className = "relative inline-block group";
     wrapper.style.width = `${img.width}px`;
     wrapper.style.height = `${img.height}px`;
 
-    // Create a container for the button
     const buttonContainer = document.createElement("div");
     buttonContainer.className =
       "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity";
     const root = createRoot(buttonContainer);
     root.render(<AIButton imgElement={img as HTMLImageElement} />);
 
-    // Wrap image with container
     img.parentNode?.insertBefore(wrapper, img);
     wrapper.appendChild(img);
     wrapper.appendChild(buttonContainer);
