@@ -24,10 +24,47 @@ const Popup = () => {
   >([]);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const toastIdCounter = useRef(0);
-  const userMenuRef = useRef(null);
-  const userMenuButtonRef = useRef(null);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
+  const userMenuButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  const validateEmail = (email: string) => {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+
+    // Validate email
+    if (!email.trim()) {
+      setEmailError("Please enter your email");
+      isValid = false;
+    } else if (!validateEmail(email.trim())) {
+      setEmailError("Please enter a valid email");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    // Validate password
+    if (!Password) {
+      setPasswordError("Please enter your password");
+      isValid = false;
+    } else if (Password.length < 6) {
+      setPasswordError("Password must be at least 6 characters");
+      isValid = false;
+    } else {
+      setPasswordError("");
+    }
+
+    return isValid;
+  };
 
   const handleLogin = async () => {
+    if (!validateForm()) {
+      return;
+    }
     setLoading(true);
     setLoginError(null);
 
@@ -101,6 +138,19 @@ const Popup = () => {
 
   useEffect(() => {
     checkLoginStatus();
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(e.target as Node) &&
+        userMenuButtonRef.current &&
+        !userMenuButtonRef.current.contains(e.target as Node)
+      ) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
@@ -833,6 +883,11 @@ const Popup = () => {
                         {loading ? "Loading..." : "Sign in"}
                       </button>
                     </div>
+                    {loginError && (
+                      <div className="text-red-500 text-xs mt-1">
+                        {loginError}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
