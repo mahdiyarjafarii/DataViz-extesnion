@@ -21,7 +21,7 @@
     },
     {
       "matches": ["<all_urls>"],
-      "js": ["src/imageContent.tsx"]
+      "js": ["src/imageButtonContent.js"]
     }
   ],
   "permissions": ["scripting", "storage"],
