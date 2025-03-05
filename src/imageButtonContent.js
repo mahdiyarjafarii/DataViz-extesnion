@@ -58,12 +58,6 @@ function createImageOverlay(image) {
        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wand-sparkles"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
           Extract (Data + Chart)
         </button>
-        <button class="pixel-insight-menu-item" data-action="analyze disabled">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          Analyze Image
-        </button>
       `;
 
     // Add event listeners
@@ -267,17 +261,120 @@ function showLoadingState(menu) {
   }
 }
 
-function showSuccessMessage(menu, message) {
+function showSuccessMessage(menu, info) {
   const successContent = `
     <div class="pixel-insight-success">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-      </svg>
-      <div class="pixel-insight-success-text">${message}</div>
+      <div class="pixel-insight-success-header">
+        <div class="pixel-insight-success-header-title">
+          <div class="icon-container">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 23 23"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              class="plotSet271"
+            >
+              <g clip-path="url(#clip0_8250_41066)">
+                <path
+                  class="main-path"
+                  d="M0 11.2797C0 5.96239 0 3.30375 1.65187 1.65187C3.30375 0 5.96239 0 11.2797 0H11.7203C17.0376 0 19.6963 0 21.3481 1.65187C23 3.30375 23 5.96239 23 11.2797V11.7203C23 17.0376 23 19.6963 21.3481 21.3481C19.6963 23 17.0376 23 11.7203 23H0V11.2797Z"
+                  fill="#0061F7"
+                ></path>
+                <path
+                  d="M0 11.2797C0 5.96239 0 3.30375 1.65187 1.65187C3.30375 0 5.96239 0 11.2797 0H11.7203C17.0376 0 19.6963 0 21.3481 1.65187C23 3.30375 23 5.96239 23 11.2797V11.7203C23 17.0376 23 19.6963 21.3481 21.3481C19.6963 23 17.0376 23 11.7203 23H0V11.2797Z"
+                  fill="url(#paint0_angular_8250_41066)"
+                  fill-opacity="0.2"
+                ></path>
+                <path
+                  class="sec-path"
+                  d="M17.0186 26.781L19.8036 23.9961L14.1722 18.3647L17.08 15.4569C18.1176 14.4193 18.8479 13.3204 19.2711 12.16C19.6807 10.9859 19.749 9.81184 19.4759 8.63779C19.2165 7.45008 18.5817 6.35111 17.5715 5.34088C16.5339 4.30334 15.435 3.65488 14.2746 3.3955C13.1142 3.13611 11.9469 3.22485 10.7729 3.66171C9.59883 4.07126 8.49304 4.79481 7.4555 5.83234L4.56674 8.7211C3.01811 10.2697 3.01811 12.7806 4.56674 14.3292L17.0186 26.781ZM11.7149 15.9074L9.24822 13.4407C8.00932 12.2018 8.00932 10.1932 9.24823 8.95427L9.95378 8.24871C10.7046 7.49787 11.5169 7.10879 12.3906 7.08148C13.2643 7.05418 14.063 7.4023 14.7865 8.12585C15.4964 8.83574 15.8445 9.63437 15.8309 10.5217C15.8036 11.3955 15.4145 12.2077 14.6637 12.9586L11.7149 15.9074Z"
+                  fill="#F6F8FB"
+                ></path>
+              </g>
+              <defs>
+                <radialGradient
+                  id="paint0_angular_8250_41066"
+                  cx="0"
+                  cy="0"
+                  r="1"
+                  gradientUnits="userSpaceOnUse"
+                  gradientTransform="translate(11.9406 10.6628) rotate(-45) scale(8.28751)"
+                >
+                  <stop stop-color="white"></stop>
+                  <stop
+                    offset="1"
+                    stop-color="#F5B7B7"
+                    stop-opacity="0"
+                  ></stop>
+                </radialGradient>
+                <clipPath id="clip0_8250_41066">
+                  <path
+                    d="M0 11.2797C0 5.96239 0 3.30375 1.65187 1.65187C3.30375 0 5.96239 0 11.2797 0H11.7203C17.0376 0 19.6963 0 21.3481 1.65187C23 3.30375 23 5.96239 23 11.2797V11.7203C23 17.0376 23 19.6963 21.3481 21.3481C19.6963 23 17.0376 23 11.7203 23H0V11.2797Z"
+                    fill="white"
+                  ></path>
+                </clipPath>
+              </defs>
+            </svg>
+          </div>
+          <h1 class="plotset-title">Plotset</h1>
+        </div>
+      </div>
+      <div class="pixel-insight-success-content">
+           <div class="pixel-insight-success-content-image">
+              <img src="https://plotset.com/api/templates/grouped-barchart-d3/128/thumbnail.png" alt="Plotset Logo" />
+            </div>
+         <div class="pixel-insight-success-content-chartLink">
+           <div class="pixel-insight-success-content-chartLink-text">
+              <div>
+                <h4 class="pixel-insight-success-content-chartLink-text-h">Chart Link</h4>
+                <p class="pixel-insight-success-content-chartLink-text-p">View and edit your chart</p>
+              </div>
+            </div>
+            <div class="button-container">
+             <button class="open-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link">
+            <path d="M15 3h6v6"></path>
+            <path d="M10 14 21 3"></path>
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+        </svg>
+        <span>Open View Chart</span>
+    </button>
+    <button class="download-button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-download">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" x2="12" y1="15" y2="3"></line>
+        </svg>
+        <span>Download Data</span>
+    </button>
+   
+</div>
+
+          </div>
+      </div>
+
+
     </div>
-  `;
+`;
   menu.innerHTML = successContent;
+  const openButton = menu.querySelector(".open-button");
+  if (openButton && info.shareUrl) {
+    openButton.addEventListener("click", () => {
+      window.open(info.shareUrl, "_blank");
+    });
+  }
+  const downloadButton = menu.querySelector(".download-button");
+  if (downloadButton && info.fullDownloadUrl) {
+    downloadButton.addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.href = info.fullDownloadUrl;
+      link.setAttribute("download", "dataset.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  }
 }
 
 // Optional: Function to update progress if you have actual progress data
@@ -285,12 +382,9 @@ function processImage(image, menu, token) {
   try {
     showLoadingState(menu);
     handleGenarteWithImage(image, token)
-      .then(() => {
+      .then((info) => {
         showNotification("Success", "Image processed successfully!", "success");
-        showSuccessMessage(
-          menu,
-          "Image processed successfully! Click to view the chart.",
-        );
+        showSuccessMessage(menu, info);
       })
       .catch((error) => {
         showNotification(
@@ -337,7 +431,7 @@ const handleGenarteWithImage = async (image, token) => {
       );
       throw new Error("Failed to upload image");
     }
-      
+
     const fileData = await response.json();
 
     const createChartEndpoint = "https://plotset.com/api/snap/charts";
@@ -350,14 +444,14 @@ const handleGenarteWithImage = async (image, token) => {
       body: JSON.stringify(fileData),
     });
 
-    if (!chartResponse.ok){
+    if (!chartResponse.ok) {
       showNotification(
         "Error",
         `Failed to process image: Failed to create chart`,
         "error",
       );
       throw new Error("Failed to create chart");
-    };
+    }
     const projectDataId = await chartResponse.json();
     const id = projectDataId.projectId;
     const editUrl = `https://plotset.com/ai/edit-data/${id}`;
@@ -370,15 +464,14 @@ const handleGenarteWithImage = async (image, token) => {
         Authorization: `${token}`,
       },
     });
-    if (!projectResponse.ok){
+    if (!projectResponse.ok) {
       showNotification(
         "Error",
         `Failed to process image:Failed to fetch project details`,
         "error",
       );
       throw new Error("Failed to fetch project details");
-
-    } 
+    }
 
     const projectData = await projectResponse.json();
     const datasetUrl = projectData?.data?.dataset?.url;
@@ -389,7 +482,7 @@ const handleGenarteWithImage = async (image, token) => {
         "error",
       );
       throw new Error("Dataset URL not found");
-    } 
+    }
 
     // Step 3: Construct full URL and download the file
     const fullDownloadUrl = `https://plotset.com/api/${datasetUrl}`;
@@ -405,15 +498,14 @@ const handleGenarteWithImage = async (image, token) => {
       body: JSON.stringify({ id: id }),
     });
 
-    if (!embedResponse.ok){
-
+    if (!embedResponse.ok) {
       showNotification(
         "Error",
         `Failed to process image: Failed to create embed`,
         "error",
       );
       throw new Error("Failed to create embed");
-    };
+    }
 
     const embedData = await embedResponse.json();
     const shareUrl = `https://plotset.com/share/${embedData.shareId}`;
@@ -610,6 +702,85 @@ function injectStyles() {
           align-items: center;
           margin-bottom: 8px;
         }
+          .button-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.download-button,
+.open-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.375rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.download-button svg,
+.open-button svg {
+    margin-right: 0.375rem;
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Download Button */
+.download-button {
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.download-button:hover {
+    background-color: #F0F0F0;
+}
+
+.download-button:focus-visible {
+    outline: none;
+    ring: 2px solid #4F9B6E; /* Example ring color */
+    ring-offset: 2px;
+}
+
+.download-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* Open Full View Button */
+.open-button {
+    background: linear-gradient(to right, #1E40AF, #4C6E9F);
+    color: white;
+    border: 1px solid transparent;
+}
+
+.open-button:hover {
+    background: linear-gradient(to right, #1D3A6B, #3A5782);
+}
+
+.open-button:focus-visible {
+    outline: none;
+    ring: 2px solid #3B82F6;
+    ring-offset: 2px;
+}
+
+.open-button:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.open-button svg {
+    stroke: white;
+}
+
+.open-button span {
+    color: white;
+}
+
         
         .pixel-insight-avatar {
           width: 32px;
@@ -771,6 +942,59 @@ function injectStyles() {
           color: #111827;
           margin-bottom: 2px;
         }
+        .pixel-insight-success-header{
+          padding: 16px;
+          position: relative;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 1px solid #e4e4e7;
+        }
+          .pixel-insight-success-content{
+            padding: 16px;
+          }
+          .pixel-insight-success-content-image{
+            padding: 16px;
+          }
+          .pixel-insight-success-content-chartLink{
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            }
+              .pixel-insight-success-content-chartLink-text{
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              
+              }
+              .pixel-insight-success-content-chartLink-text-h{
+              font-size: 14px;
+              font-weight: 600;
+              }
+              .pixel-insight-success-content-chartLink-text-p{
+              font-size: 9px;
+              }
+        .pixel-insight-success-header-title{
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          }
+          icon-container {
+  width: 16px;
+  height: 16px;
+  background: #0061F7;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.plotset-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
         
         .pixel-insight-notification-message {
           font-size: 12px;
