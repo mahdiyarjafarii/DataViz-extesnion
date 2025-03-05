@@ -264,12 +264,12 @@ const Popup = () => {
                         className="flex items-center space-x-2 focus:outline-none"
                         onClick={() => setShowUserMenu(!showUserMenu)}
                       >
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-medium text-sm">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100  flex items-center justify-center text-indigo-600  font-medium text-sm">
                           {getInitials("mahdiyar")}
                         </div>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 text-gray-500 dark:text-gray-400"
+                          className="h-5 w-5 text-gray-500 "
                           viewBox="0 0 20 20"
                           fill="currentColor"
                         >
@@ -283,50 +283,28 @@ const Popup = () => {
 
                       <div
                         ref={userMenuRef}
-                        className={`absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 z-10 transform origin-top-right transition-all duration-100 ${
+                        className={`absolute right-0 mt-2 w-48 bg-white  rounded-lg shadow-lg py-1 z-10 transform origin-top-right transition-all duration-100 ${
                           showUserMenu
                             ? "scale-100 opacity-100"
                             : "scale-95 opacity-0 hidden"
                         }`}
                       >
-                        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        <div className="px-4 py-3 border-b border-gray-200 ">
+                          <p className="text-sm font-medium text-gray-900 ">
                             mahdiyar
                           </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                          <p className="text-xs text-gray-500  truncate">
                             mahdiyar@gmail.com
                           </p>
                         </div>
                         <a
                           href="#"
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="block px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
                         >
                           <div className="flex items-center">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                              />
-                            </svg>
-                            Profile
-                          </div>
-                        </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                        >
-                          <div className="flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400"
+                              className="h-4 w-4 mr-2 text-gray-500 "
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -349,12 +327,12 @@ const Popup = () => {
                         </a>
                         <a
                           href="#"
-                          className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="block px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
                         >
                           <div className="flex items-center">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mr-2 text-gray-500 dark:text-gray-400"
+                              className="h-4 w-4 mr-2 text-gray-500 "
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -369,10 +347,10 @@ const Popup = () => {
                             Help
                           </div>
                         </a>
-                        <div className="border-t border-gray-200 dark:border-gray-700"></div>
+                        <div className="border-t border-gray-200 "></div>
                         <a
                           href="#"
-                          className="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                          className="block px-4 py-2 text-sm text-red-600  hover:bg-gray-100 "
                           onClick={handleLogout}
                         >
                           <div className="flex items-center">
@@ -401,7 +379,7 @@ const Popup = () => {
               <main className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* Credits and Stats */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 ">
+                  <div className="bg-white  rounded-xl shadow-sm p-4 border border-gray-200 ">
                     <div className="flex items-center justify-between">
                       <div>
                         <p className="text-sm text-gray-500 ">
@@ -449,7 +427,7 @@ const Popup = () => {
                       <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="h-6 w-6 text-green-600 dark:text-green-400"
+                          className="h-6 w-6 text-green-600 "
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -636,9 +614,9 @@ const Popup = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 border border-gray-200 ">
+                <div className="bg-white  rounded-xl shadow-sm p-4 border border-gray-200 ">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+                    <h2 className="text-lg font-medium text-gray-900 ">
                       Recent Activity
                     </h2>
                     <button className="text-sm text-indigo-600  hover:text-indigo-800 ">
@@ -647,24 +625,34 @@ const Popup = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-12 w-12 mx-auto mb-3 text-gray-400 dark:text-gray-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
-                        />
-                      </svg>
-                      <p className="text-sm">No recent activity</p>
-                      <p className="text-xs mt-1">
-                        Start processing images to see your activity here
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="relative mx-auto w-fit">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-12 w-12 mx-auto mb-3 text-indigo-500"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="1.5"
+                            d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.631 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-8.54a6 6 0 00-7.381 5.84h4.8m2.581-5.84a14.927 14.927 0 00-2.58 5.84m2.699 2.7c-.103.021-.207.041-.311.06a15.09 15.09 0 01-2.448-2.448 14.9 14.9 0 01.06-.312m-2.24 2.39a4.493 4.493 0 00-1.757 4.306 4.493 4.493 0 004.306-1.758M16.5 9a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"
+                          />
+                        </svg>
+                        <div className="absolute -top-1 -right-2 bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
+                          Soon
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900">
+                        Coming Soon
+                      </p>
+                      <p className="text-sm mt-1">
+                        We're working on this exciting new feature
+                      </p>
+                      <p className="text-xs mt-1 text-gray-400">
+                        Activity tracking will be available in our next update
                       </p>
                     </div>
                   </div>
@@ -896,7 +884,7 @@ const Popup = () => {
                 Don't have an account?{" "}
                 <a
                   href="https://plotset.com"
-                  className="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                  className="text-indigo-600 hover:text-indigo-500 "
                 >
                   Create in PlotSet
                 </a>

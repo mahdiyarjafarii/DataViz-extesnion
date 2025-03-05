@@ -1,3 +1,8 @@
+import useLocalStorage, {
+  getStorageValue,
+  setStorageValue,
+} from "./hooks/useLocalStorage";
+
 // Global error handler
 window.addEventListener("error", (event) => {
   console.error("Content script error:", event.error);
@@ -17,7 +22,7 @@ window.addEventListener("error", (event) => {
 function createImageOverlay(image) {
   try {
     // Skip small images
-    if (image.width < 100 || image.height < 100) return;
+    if (image.width < 130 || image.height < 130) return;
 
     // Create overlay container
     const overlay = document.createElement("div");
@@ -50,21 +55,10 @@ function createImageOverlay(image) {
         </div>
         <div class="pixel-insight-menu-divider"></div>
         <button class="pixel-insight-menu-item" data-action="extract">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
-          </svg>
-          Extract Data
+       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wand-sparkles"><path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72"/><path d="m14 7 3 3"/><path d="M5 6v4"/><path d="M19 14v4"/><path d="M10 2v2"/><path d="M7 8H3"/><path d="M21 16h-4"/><path d="M11 3H9"/></svg>
+          Extract (Data + Chart)
         </button>
-        <button class="pixel-insight-menu-item" data-action="chart">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"></line>
-            <line x1="12" y1="20" x2="12" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="14"></line>
-            <line x1="2" y1="20" x2="22" y2="20"></line>
-          </svg>
-          Make Chart
-        </button>
-        <button class="pixel-insight-menu-item" data-action="analyze">
+        <button class="pixel-insight-menu-item" data-action="analyze disabled">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
           </svg>
@@ -88,82 +82,32 @@ function createImageOverlay(image) {
 
     // Handle menu item clicks
     menu.querySelectorAll(".pixel-insight-menu-item").forEach((item) => {
-      item.addEventListener("click", (e) => {
+      item.addEventListener("click", async (e) => {
         e.stopPropagation();
-        const action = e.currentTarget.getAttribute("data-action");
 
+        const token = await getStorageValue("user_token", "");
+        const status = await getStorageValue("isLogin", false);
         // Check if user is logged in
-        chrome.storage.local.get(["isLoggedIn", "user"], (result) => {
-          if (chrome.runtime.lastError) {
-            showNotification(
-              "Error",
-              chrome.runtime.lastError.message,
-              "error",
-            );
-            return;
-          }
 
-          if (!result.isLoggedIn) {
-            showNotification(
-              "Authentication Required",
-              "Please log in to use this feature",
-              "warning",
-            );
-            return;
-          }
-
-          if (result.user.credits <= 0) {
-            showNotification(
-              "No Credits",
-              "You have no credits left. Please purchase more credits.",
-              "warning",
-            );
-            return;
-          }
-
-          // Process the image based on the action
-          processImage(image, action);
-
-          // Deduct credits
-          const newCredits = result.user.credits - 1;
-          chrome.storage.local.set(
-            {
-              user: { ...result.user, credits: newCredits },
-            },
-            () => {
-              if (chrome.runtime.lastError) {
-                showNotification(
-                  "Error",
-                  chrome.runtime.lastError.message,
-                  "error",
-                );
-                return;
-              }
-
-              // Update credits display
-              document.getElementById("menu-credits").textContent =
-                `${newCredits} Credits`;
-            },
-          );
-
-          // Add to activity
-          addActivity(action, image.src);
-
-          menu.classList.remove("show");
-
-          // Show success notification
-          const actionName =
-            action === "extract"
-              ? "Data Extraction"
-              : action === "chart"
-                ? "Chart Creation"
-                : "Image Analysis";
+        if (!status || !token) {
           showNotification(
-            "Processing Started",
-            `${actionName} has started. You will be notified when it's complete.`,
-            "success",
+            "Authentication Required",
+            "Please log in to use this feature",
+            "warning",
           );
-        });
+          return;
+        }
+
+        const menu = item.closest(".pixel-insight-menu");
+
+        // Call processImage with menu as the second argument
+        processImage(image, menu, token);
+
+        showNotification(
+          "Processing Started",
+          `AI magic has started. You will be notified when it's complete.`,
+          "success",
+        );
       });
     });
 
@@ -274,21 +218,88 @@ function updateMenuUserInfo() {
 }
 
 // Process image based on action
-function processImage(image, action) {
+
+function updateMenuContent(menu, content) {
+  menu.innerHTML = content;
+}
+
+// Function to show loading state in the menu
+function showLoadingState(menu) {
+  const loadingContent = `
+    <div class="pixel-insight-loading">
+      <div class="pixel-insight-progress-container">
+        <div class="pixel-insight-progress-text">
+          <span>Processing image...</span>
+          <span class="pixel-insight-progress-percentage">Please wait</span>
+        </div>
+        <div class="pixel-insight-progress-bar-bg">
+          <div class="pixel-insight-progress-bar-fill"></div>
+        </div>
+        <div class="pixel-insight-progress-dots">
+          <div class="pixel-insight-progress-dot"></div>
+          <div class="pixel-insight-progress-dot"></div>
+          <div class="pixel-insight-progress-dot"></div>
+        </div>
+      </div>
+    </div>
+  `;
+  // Assuming updateMenuContent is a function defined elsewhere,  if not define it here.
+  function updateMenuContent(menu, content) {
+    menu.innerHTML = content;
+  }
+  updateMenuContent(menu, loadingContent);
+
+  // Start the animation for indeterminate progress
+  const progressBar = menu.querySelector(".pixel-insight-progress-bar-fill");
+  if (progressBar) {
+    let width = 0;
+    const simulateProgress = setInterval(() => {
+      if (width >= 95) {
+        clearInterval(simulateProgress);
+      } else {
+        width += (95 - width) * 0.1;
+        progressBar.style.width = width + "%";
+      }
+    }, 300);
+
+    // Store the interval ID on the menu element so it can be cleared if needed
+    menu.dataset.progressInterval = simulateProgress;
+  }
+}
+
+function showSuccessMessage(menu, message) {
+  const successContent = `
+    <div class="pixel-insight-success">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <div class="pixel-insight-success-text">${message}</div>
+    </div>
+  `;
+  menu.innerHTML = successContent;
+}
+
+// Optional: Function to update progress if you have actual progress data
+function processImage(image, menu, token) {
   try {
-    // Send message to background script
-    chrome.runtime.sendMessage(
-      {
-        action: action,
-        imageUrl: image.src,
-      },
-      (response) => {
-        if (chrome.runtime.lastError) {
-          showNotification("Error", chrome.runtime.lastError.message, "error");
-          console.error("Error sending message:", chrome.runtime.lastError);
-        }
-      },
-    );
+    showLoadingState(menu);
+    handleGenarteWithImage(image, token)
+      .then(() => {
+        showNotification("Success", "Image processed successfully!", "success");
+        showSuccessMessage(
+          menu,
+          "Image processed successfully! Click to view the chart.",
+        );
+      })
+      .catch((error) => {
+        showNotification(
+          "Error",
+          `Failed to process image: ${error.message}`,
+          "error",
+        );
+        console.error("Error processing image:", error);
+      });
   } catch (error) {
     showNotification(
       "Error",
@@ -299,40 +310,121 @@ function processImage(image, action) {
   }
 }
 
-// Add activity to storage
-function addActivity(action, imageUrl) {
+const handleGenarteWithImage = async (image, token) => {
+  let informationGenerated = {};
   try {
-    const activity = {
-      action,
-      imageUrl,
-      timestamp: new Date().toISOString(),
-      status: "processing",
+    const imageResponse = await fetch(image.src);
+    if (!imageResponse.ok) throw new Error("Failed to fetch image");
+    const imageBlob = await imageResponse.blob();
+
+    const apiEndpoint = "https://plotset.com/api/snap/image";
+    const bodyFormData = new FormData();
+    bodyFormData.append("file", imageBlob);
+
+    const response = await fetch(apiEndpoint, {
+      method: "POST",
+      body: bodyFormData,
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      showNotification(
+        "Error",
+        `Failed to process image: Failed to upload image`,
+        "error",
+      );
+      throw new Error("Failed to upload image");
+    }
+      
+    const fileData = await response.json();
+
+    const createChartEndpoint = "https://plotset.com/api/snap/charts";
+    const chartResponse = await fetch(createChartEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${token}`,
+      },
+      body: JSON.stringify(fileData),
+    });
+
+    if (!chartResponse.ok){
+      showNotification(
+        "Error",
+        `Failed to process image: Failed to create chart`,
+        "error",
+      );
+      throw new Error("Failed to create chart");
+    };
+    const projectDataId = await chartResponse.json();
+    const id = projectDataId.projectId;
+    const editUrl = `https://plotset.com/ai/edit-data/${id}`;
+    informationGenerated["PreviewLink"] = editUrl;
+
+    const projectApi = `https://plotset.com/api/project/get/${id}`;
+    const projectResponse = await fetch(projectApi, {
+      method: "GET",
+      headers: {
+        Authorization: `${token}`,
+      },
+    });
+    if (!projectResponse.ok){
+      showNotification(
+        "Error",
+        `Failed to process image:Failed to fetch project details`,
+        "error",
+      );
+      throw new Error("Failed to fetch project details");
+
+    } 
+
+    const projectData = await projectResponse.json();
+    const datasetUrl = projectData?.data?.dataset?.url;
+    if (!datasetUrl) {
+      showNotification(
+        "Error",
+        `Failed to process image: Dataset URL not found`,
+        "error",
+      );
+      throw new Error("Dataset URL not found");
+    } 
+
+    // Step 3: Construct full URL and download the file
+    const fullDownloadUrl = `https://plotset.com/api/${datasetUrl}`;
+    informationGenerated["fullDownloadUrl"] = fullDownloadUrl;
+
+    const embedApi = "https://plotset.com/api/embed/create";
+    const embedResponse = await fetch(embedApi, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${token}`,
+      },
+      body: JSON.stringify({ id: id }),
+    });
+
+    if (!embedResponse.ok){
+
+      showNotification(
+        "Error",
+        `Failed to process image: Failed to create embed`,
+        "error",
+      );
+      throw new Error("Failed to create embed");
     };
 
-    chrome.storage.local.get(["activities"], (result) => {
-      if (chrome.runtime.lastError) {
-        console.error("Error getting activities:", chrome.runtime.lastError);
-        return;
-      }
+    const embedData = await embedResponse.json();
+    const shareUrl = `https://plotset.com/share/${embedData.shareId}`;
+    informationGenerated["shareUrl"] = shareUrl;
 
-      const activities = result.activities || [];
-      activities.unshift(activity);
-
-      // Keep only the last 20 activities
-      if (activities.length > 20) {
-        activities.pop();
-      }
-
-      chrome.storage.local.set({ activities }, () => {
-        if (chrome.runtime.lastError) {
-          console.error("Error saving activities:", chrome.runtime.lastError);
-        }
-      });
-    });
+    return informationGenerated;
   } catch (error) {
-    console.error("Error adding activity:", error);
+    console.error("Error extracting data:", error);
+    throw error;
   }
-}
+};
 
 // Show notification
 function showNotification(title, message, type = "info") {
@@ -468,18 +560,18 @@ function injectStyles() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #295d9b, #3b78c2);
           color: white;
           border: none;
           cursor: pointer;
-          box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+           box-shadow: 0 2px 10px rgba(41, 93, 155, 0.3); 
           transition: all 0.2s ease;
           z-index: 10000;
         }
         
         .pixel-insight-button:hover {
           transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+          box-shadow: 0 4px 12px rgba(41, 93, 155, 0.4);
         }
         
         /* Menu */
@@ -523,7 +615,7 @@ function injectStyles() {
           width: 32px;
           height: 32px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          background: linear-gradient(135deg, #295d9b, #3b78c2);
           color: white;
           display: flex;
           align-items: center;
@@ -593,8 +685,22 @@ function injectStyles() {
         }
         
         .pixel-insight-menu-item svg {
-          color: #6366f1;
+          color: #0771ED;
         }
+          .pixel-insight-menu-item:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+}
+
+.pixel-insight-menu-item:disabled svg {
+  color: #9ca3af;
+}
+
+.pixel-insight-menu-item:disabled:hover {
+  background-color: #f3f4f6;
+}
         
         /* Notifications */
         #pixel-insight-notification-container {
@@ -686,56 +792,77 @@ function injectStyles() {
         .pixel-insight-notification-close:hover {
           color: #6b7280;
         }
+          .pixel-insight-loading {
+          padding: 16px;
+          width: 100%;
+        }
         
-        /* Dark mode support */
-        @media (prefers-color-scheme: dark) {
-          .pixel-insight-menu {
-            background-color: #1f2937;
-            border: 1px solid #374151;
+        .pixel-insight-progress-container {
+          display: flex;
+          flex-direction: column;
+          width: 100%;
+        }
+        
+        .pixel-insight-progress-text {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          font-size: 13px;
+          color: #374151;
+        }
+        
+        .pixel-insight-progress-percentage {
+          font-weight: 500;
+          color: #3b82f6;
+        }
+        
+        .pixel-insight-progress-bar-bg {
+          height: 8px;
+          background-color: #e5e7eb;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
+        .pixel-insight-progress-bar-fill {
+          height: 100%;
+          width: 0%;
+          background: linear-gradient(90deg, #3b82f6, #6366f1);
+          border-radius: 4px;
+          transition: width 2s ease-out;
+        }
+        
+        .pixel-insight-progress-dots {
+          display: flex;
+          justify-content: center;
+          margin-top: 12px;
+          gap: 4px;
+        }
+        
+        .pixel-insight-progress-dot {
+          width: 6px;
+          height: 6px;
+          background-color: #3b82f6;
+          border-radius: 50%;
+          animation: pixel-insight-bounce 1.4s infinite ease-in-out both;
+        }
+        
+        .pixel-insight-progress-dot:nth-child(1) {
+          animation-delay: -0.32s;
+        }
+        
+        .pixel-insight-progress-dot:nth-child(2) {
+          animation-delay: -0.16s;
+        }
+        
+        @keyframes pixel-insight-bounce {
+          0%, 80%, 100% {
+            transform: scale(0);
           }
-          
-          .pixel-insight-menu-header {
-            background-color: #111827;
-            border-bottom: 1px solid #374151;
-          }
-          
-          .pixel-insight-username {
-            color: #f9fafb;
-          }
-          
-          .pixel-insight-email {
-            color: #9ca3af;
-          }
-          
-          .pixel-insight-credits {
-            background-color: rgba(99, 102, 241, 0.2);
-          }
-          
-          .pixel-insight-menu-divider {
-            background-color: #374151;
-          }
-          
-          .pixel-insight-menu-item {
-            color: #e5e7eb;
-          }
-          
-          .pixel-insight-menu-item:hover {
-            background-color: #374151;
-          }
-          
-          .pixel-insight-notification {
-            background-color: #1f2937;
-            border: 1px solid #374151;
-          }
-          
-          .pixel-insight-notification-title {
-            color: #f9fafb;
-          }
-          
-          .pixel-insight-notification-message {
-            color: #9ca3af;
+          40% {
+            transform: scale(1);
           }
         }
+        
       `;
 
     document.head.appendChild(style);
