@@ -13,6 +13,11 @@ const Popup = () => {
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [token, setToken] = useLocalStorage(SETTINGS.USERTOKEN, "");
+  const [userinfo, setUserInfo] = useLocalStorage(SETTINGS.USERINFO, {
+    name: "",
+    lastname: "",
+    email: "",
+  });
   const [isEnabled, setIsEnabled] = useLocalStorage(SETTINGS.ENABLED, true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -84,7 +89,14 @@ const Popup = () => {
       const data = await response.json();
 
       if (data.results) {
+        const userData = {
+          name: data.user.firstname,
+          lastname: data.user.lastname,
+          email: data.user.email,
+        };
+
         setToken(data.user.token);
+        setUserInfo(userData);
         setSuccess(true);
         setIsLoggedIn(true);
         await setStorageValue(SETTINGS.ISLOGGEDIN, true);
@@ -265,7 +277,7 @@ const Popup = () => {
                         onClick={() => setShowUserMenu(!showUserMenu)}
                       >
                         <div className="w-8 h-8 rounded-full bg-indigo-100  flex items-center justify-center text-indigo-600  font-medium text-sm">
-                          {getInitials("mahdiyar")}
+                          {getInitials(userinfo.name)}
                         </div>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -291,10 +303,10 @@ const Popup = () => {
                       >
                         <div className="px-4 py-3 border-b border-gray-200 ">
                           <p className="text-sm font-medium text-gray-900 ">
-                            mahdiyar
+                            {userinfo.name}
                           </p>
                           <p className="text-xs text-gray-500  truncate">
-                            mahdiyar@gmail.com
+                            {userinfo.email}
                           </p>
                         </div>
                         <a
@@ -325,28 +337,7 @@ const Popup = () => {
                             Settings
                           </div>
                         </a>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 text-sm text-gray-700  hover:bg-gray-100 "
-                        >
-                          <div className="flex items-center">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-4 w-4 mr-2 text-gray-500 "
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            Help
-                          </div>
-                        </a>
+
                         <div className="border-t border-gray-200 "></div>
                         <a
                           href="#"

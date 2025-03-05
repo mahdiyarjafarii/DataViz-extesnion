@@ -161,51 +161,51 @@ function createImageOverlay(image) {
 }
 
 // Update user info in menu
-function updateMenuUserInfo() {
+async function updateMenuUserInfo() {
   try {
-    chrome.storage.local.get(["user"], (result) => {
-      if (chrome.runtime.lastError) {
-        console.error("Error getting user data:", chrome.runtime.lastError);
-        return;
-      }
-
-      if (result.user) {
-        const avatarElements = document.querySelectorAll(
-          ".pixel-insight-avatar",
-        );
-        const usernameElements = document.querySelectorAll(
-          ".pixel-insight-username",
-        );
-        const emailElements = document.querySelectorAll(".pixel-insight-email");
-        const creditsElements = document.querySelectorAll(
-          ".pixel-insight-credits",
-        );
-
-        // Get initials for avatar
-        const initials = result.user.name
-          ? result.user.name
-              .split(" ")
-              .map((part) => part.charAt(0))
-              .join("")
-              .toUpperCase()
-              .substring(0, 2)
-          : "U";
-
-        // Update all instances
-        avatarElements.forEach((el) => {
-          el.textContent = initials;
-        });
-        usernameElements.forEach((el) => {
-          el.textContent = result.user.name || "User";
-        });
-        emailElements.forEach((el) => {
-          el.textContent = result.user.email || "user@example.com";
-        });
-        creditsElements.forEach((el) => {
-          el.textContent = `${result.user.credits} Credits`;
-        });
-      }
+    const token = await getStorageValue("user_token", "");
+    const status = await getStorageValue("isLogin", false);
+    const userInfo = await getStorageValue("user_info", {
+      name: "",
+      lastname: "",
+      email: "",
     });
+    console.log("User Info", userInfo);
+
+    if (token && status && userInfo.name) {
+      const avatarElements = document.querySelectorAll(".pixel-insight-avatar");
+      const usernameElements = document.querySelectorAll(
+        ".pixel-insight-username",
+      );
+      const emailElements = document.querySelectorAll(".pixel-insight-email");
+      const creditsElements = document.querySelectorAll(
+        ".pixel-insight-credits",
+      );
+
+      // Get initials for avatar
+      const initials = userInfo.name
+        ? result.user.name
+            .split(" ")
+            .map((part) => part.charAt(0))
+            .join("")
+            .toUpperCase()
+            .substring(0, 2)
+        : "U";
+
+      // Update all instances
+      avatarElements.forEach((el) => {
+        el.textContent = initials;
+      });
+      usernameElements.forEach((el) => {
+        el.textContent = userInfo.name || "User";
+      });
+      emailElements.forEach((el) => {
+        el.textContent = userInfo.email || "user@example.com";
+      });
+      creditsElements.forEach((el) => {
+        el.textContent = `5 Credits`;
+      });
+    }
   } catch (error) {
     console.error("Error updating menu user info:", error);
   }
@@ -424,6 +424,14 @@ const handleGenarteWithImage = async (image, token) => {
     });
 
     if (!response.ok) {
+      if (response.status === 429) {
+        showNotification(
+          "Error",
+          "Too many requests. Please try again later.",
+          "error",
+        );
+        throw new Error("Too many requests. Please try again later.");
+      }
       showNotification(
         "Error",
         `Failed to process image: Failed to upload image`,
